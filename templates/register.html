@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block body %}
+    {% for message in get_flashed_messages() %}
+      <div class="alert-error">Alert: {{ message }}</div>
+    {% endfor %}
+    <form action="/register" method="post">
+        <div class="form-group">
+            <input class="form-control" name="username" type="text" placeholder="Username">
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="password" type="password" placeholder="Password">
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="confirmation" type="password" placeholder="Confirm Password">
+        </div>
+        <br>
+        <button class="btn btn-primary" type="submit">Register</button>
+    </form>
+{% endblock %}
