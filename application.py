@@ -27,7 +27,7 @@ db = scoped_session(sessionmaker(bind=engine))
 @app.route("/")
 @login_required
 def index():
-    return "TODO"
+    return render_template("index.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -70,9 +70,7 @@ def register():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-
-    # Forget any user_id
-    session.clear()
+    """ User logs in """
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
@@ -106,11 +104,19 @@ def login():
         session["user_id"] = row["id"]
 
         # Redirect user to home page
+        flash(f"You are logged in as '{username}'", "success")
         return redirect("/")
-
-
-
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    """Log user out"""
+
+    # Forget any user_id
+    session.clear()
+
+    # Redirect user to login form
+    return redirect("/")
