@@ -27,7 +27,7 @@ db = scoped_session(sessionmaker(bind=engine))
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
-
+    """ Allows user to search for books and see results"""
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
         query = request.form.get("query")
@@ -43,9 +43,22 @@ def index():
     else:
         return render_template("index.html")
 
+@app.route("/book/<int:book_id>")
+def book(book_id):
+    """ Lists details about a single book """
+
+    # Make sure book exists.
+    book = db.execute("SELECT * FROM books WHERE id = :id", {"id": book_id}).fetchone()
+    if book is None:
+        flash("Invalid book ID", "warning")
+        return redirect("/")
+
+    # Get all details:
+    return render_template("book.html", book=book)
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
-    """Register user"""
+    """ Register user """
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":

@@ -16,10 +16,11 @@
         <ul>
         {% for result in results %}
             <li>
-                {{ result.isbn }}
-                {{ result.title }}
-                {{ result.author }}
-                {{ result.year }}
+                <a href="{{ url_for('book', book_id=result.id)}}"
+                    <span class="book-title">{{ result.title }}</span>
+                </a>
+                <span class="book-author">by </span><span class="book-author">{{ result.author }}</span>
+                <span class="book-year">{{ result.year }}</span>
             </li>
         {% endfor %}
         </ul>
