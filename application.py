@@ -28,6 +28,7 @@ db = scoped_session(sessionmaker(bind=engine))
 @login_required
 def index():
     """ Allows user to search for books and see results"""
+
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
         query = request.form.get("query")
@@ -37,13 +38,16 @@ def index():
             return redirect("/")
 
         results = db.execute("SELECT * FROM books WHERE isbn LIKE :query OR author LIKE :query OR title LIKE :query ", {"query": "%" + query + "%"}).fetchall()
+        if not results:
+            flash("Book not found, sorry", "warning")
+
         return render_template("index.html", results=results)
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("index.html")
 
-@app.route("/book/<int:book_id>")
+@app.route("/book/<int:book_id>", methods=["GET", "POST"])
 def book(book_id):
     """ Lists details about a single book """
 
@@ -53,8 +57,34 @@ def book(book_id):
         flash("Invalid book ID", "warning")
         return redirect("/")
 
-    # Get all details:
-    return render_template("book.html", book=book)
+    # Load all reviews
+    reviews = db.execute("SELECT * FROM reviews JOIN users ON reviews.user_id = users.id WHERE book_id = :book_id", {"book_id": book.id}).fetchall()
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+
+        # Manage new review.
+        review = request.form.get("review")
+        if review:
+
+            # Show message if user has already reviewed this book.
+            for review in reviews:
+                if review.user_id == session["user_id"]:
+                    flash("You have already reviewed this book. Thnak you.", "warning")
+                    return render_template("book.html", book=book, reviews=reviews)
+
+            # Update database with new review.
+            db.execute("INSERT INTO reviews (book_id, user_id, review) VALUES (:book_id, :user_id, :review)", {"book_id": book.id, "user_id": session["user_id"], "review": review})
+            db.commit()
+            flash("Your review has been submitted", "success")
+
+        # Get all book details:
+        return render_template("book.html", book=book, reviews=reviews)
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        # Get all book details:
+        return render_template("book.html", book=book, reviews=reviews)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():

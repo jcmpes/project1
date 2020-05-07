@@ -7,9 +7,29 @@
 {% block body %}
     <h2>Book details:</h2>
     <ul>
-      <li>{{ book.title }}</li>
-      <li>by {{ book.author }}</li>
+      <li>Title: {{ book.title }}</li>
+      <li>Author: {{ book.author }}</li>
       <li>Published: {{ book.year }}</li>
+      <li>ISBN: {{ book.isbn }}</li>
     </ul>
-
+    <h3>Community reviews:</h3>
+    <ul>
+      {% for review in reviews %}
+          <li>
+            <span class="review-user">{{ review.username }} </span>
+            <span class="review-date">reviewed on {{ review.ts }}</span>
+            <br>
+            <span class="review-user">{{ review.review }}</span>
+          </li>
+      {% endfor %}
+    </ul>
+    <h3>Submit a review:</h3>
+    <div class="review">
+        <form action="/book/{{ book.id }}" method="post">
+            <div class="form-group">
+                <input class="form-control" type="text" name="review" placeholder="Write Your Review">
+                <button class="btn btn-primary" type="submit">Submit Review</button>
+            </div>
+        </form>
+    </div>
 {% endblock %}
