@@ -5,5 +5,23 @@
 {% endblock %}
 
 {% block body %}
-  TODO
+    <form action="/" method="POST">
+        <div class="form-group">
+            <input class="form-control" name="query" type="text" palceholder="Search Books">
+            <button class="btn btn-primary" type="submit">Search</button>
+        </div>
+    </form>
+    {% if results %}
+        <h2>Search results:</h2>
+        <ul>
+        {% for result in results %}
+            <li>
+                {{ result.isbn }}
+                {{ result.title }}
+                {{ result.author }}
+                {{ result.year }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
 {% endblock %}

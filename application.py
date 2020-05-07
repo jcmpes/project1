@@ -24,10 +24,24 @@ engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 @login_required
 def index():
-    return render_template("index.html")
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+        query = request.form.get("query")
+
+        if not query:
+            flash("Nothing to search for", "warning")
+            return redirect("/")
+
+        results = db.execute("SELECT * FROM books WHERE isbn LIKE :query OR author LIKE :query OR title LIKE :query ", {"query": "%" + query + "%"}).fetchall()
+        return render_template("index.html", results=results)
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("index.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
