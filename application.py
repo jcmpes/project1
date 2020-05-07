@@ -2,7 +2,7 @@ import os
 import re
 import requests
 
-from flask import Flask, flash, session, request, render_template, redirect
+from flask import Flask, flash, session, request, render_template, redirect, jsonify
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -42,11 +42,12 @@ def index():
         if not results:
             flash("Book not found, sorry", "warning")
 
-        return render_template("index.html", results=results)
+        return render_template("index.html", results=results, session=session)
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("index.html")
+
 
 @app.route("/book/<int:book_id>", methods=["GET", "POST"])
 def book(book_id):
@@ -81,7 +82,7 @@ def book(book_id):
             # Show message if user has already reviewed this book.
             for review in reviews:
                 if review.user_id == session["user_id"]:
-                    flash("You have already reviewed this book. Thnak you.", "warning")
+                    flash("You have already reviewed this book. Thank you.", "warning")
                     return render_template("book.html", book=book, reviews=reviews, ratings=ratings)
 
             # Update database with new review.
@@ -97,6 +98,35 @@ def book(book_id):
     else:
         # Get all book details:
         return render_template("book.html", book=book, reviews=reviews, ratings=ratings)
+
+
+@app.route("/api/<isbn>")
+def book_api(isbn):
+    """ Return details about a single book """
+
+    # Make sure book exists.
+    book = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": isbn}).fetchone()
+    if book is None:
+        return jsonify({"error": "Invalid isbn"}), 404
+
+    # Connect with goodreads API.
+    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"isbns": book.isbn, "key": "zxyhd0NgDyKu0wUBYjHIbw"})
+    if res.status_code != 200:
+        raise Exception("Error: API request unsuccessful")
+
+    data = res.json()
+    ratings_count = data["books"][0]["work_ratings_count"]
+    avg_rating = data["books"][0]["average_rating"]
+
+    # Get all details.
+    return jsonify({
+        "title": book.title,
+        "author": book.author,
+        "year": book.year,
+        "isbn": book.isbn,
+        "review_count": ratings_count,
+        "average_score": avg_rating
+    })
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -136,6 +166,7 @@ def register():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -180,9 +211,10 @@ def login():
     else:
         return render_template("login.html")
 
+
 @app.route("/logout")
 def logout():
-    """Log user out"""
+    """ Log user out"""
 
     # Forget any user_id
     session.clear()

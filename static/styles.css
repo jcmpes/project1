@@ -14,3 +14,14 @@
   color: grey;
   font-size: smaller;
 }
+
+.siteHeader {
+    display: flex;
+    justify-content: center;
+    height: 80px; /* or other desired height */
+    overflow: hidden;
+}
+
+.siteHeader > img {
+    flex: none; /* keep aspect ratio */
+}
