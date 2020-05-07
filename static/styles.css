@@ -1,5 +1,3 @@
-
-
 .book-title {
   color: #333333;
   font-size: 120%;
@@ -12,7 +10,7 @@
   line-height: 150%;
 }
 
-.book-year {
+.book-year, .review-date {
   color: grey;
   font-size: smaller;
 }

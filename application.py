@@ -1,5 +1,6 @@
 import os
 import re
+import requests
 
 from flask import Flask, flash, session, request, render_template, redirect
 from flask_session import Session
@@ -60,6 +61,16 @@ def book(book_id):
     # Load all reviews
     reviews = db.execute("SELECT * FROM reviews JOIN users ON reviews.user_id = users.id WHERE book_id = :book_id", {"book_id": book.id}).fetchall()
 
+    # Connect with goodreads API.
+    res = requests.get("https://www.goodreads.com/book/review_counts.json", params={"isbns": book.isbn, "key": "zxyhd0NgDyKu0wUBYjHIbw"})
+    if res.status_code != 200:
+        raise Exception("Error: API request unsuccessful")
+
+    data = res.json()
+    ratings_count = data["books"][0]["work_ratings_count"]
+    avg_rating = data["books"][0]["average_rating"]
+    ratings = {"count": ratings_count, "average": avg_rating}
+
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
@@ -71,20 +82,21 @@ def book(book_id):
             for review in reviews:
                 if review.user_id == session["user_id"]:
                     flash("You have already reviewed this book. Thnak you.", "warning")
-                    return render_template("book.html", book=book, reviews=reviews)
+                    return render_template("book.html", book=book, reviews=reviews, ratings=ratings)
 
             # Update database with new review.
             db.execute("INSERT INTO reviews (book_id, user_id, review) VALUES (:book_id, :user_id, :review)", {"book_id": book.id, "user_id": session["user_id"], "review": review})
             db.commit()
             flash("Your review has been submitted", "success")
+            reviews = db.execute("SELECT * FROM reviews JOIN users ON reviews.user_id = users.id WHERE book_id = :book_id", {"book_id": book.id}).fetchall()
 
         # Get all book details:
-        return render_template("book.html", book=book, reviews=reviews)
+        return render_template("book.html", book=book, reviews=reviews, ratings=ratings)
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         # Get all book details:
-        return render_template("book.html", book=book, reviews=reviews)
+        return render_template("book.html", book=book, reviews=reviews, ratings=ratings)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():

@@ -11,6 +11,7 @@
       <li>Author: {{ book.author }}</li>
       <li>Published: {{ book.year }}</li>
       <li>ISBN: {{ book.isbn }}</li>
+      <li>Average Rating: {{ ratings.average }} · {{ ratings.count }} ratings</li>
     </ul>
     <h3>Community reviews:</h3>
     <ul>
@@ -19,7 +20,7 @@
             <span class="review-user">{{ review.username }} </span>
             <span class="review-date">reviewed on {{ review.ts }}</span>
             <br>
-            <span class="review-user">{{ review.review }}</span>
+            <span class="review-content">{{ review.review }}</span>
           </li>
       {% endfor %}
     </ul>
