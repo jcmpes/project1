@@ -39,6 +39,7 @@ def index():
             return redirect("/")
 
         results = db.execute("SELECT * FROM books WHERE isbn LIKE :query OR author LIKE :query OR title LIKE :query ", {"query": "%" + query + "%"}).fetchall()
+
         if not results:
             flash("Book not found, sorry", "warning")
 

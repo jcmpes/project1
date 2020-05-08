@@ -11,9 +11,11 @@
       <li>Author: {{ book.author }}</li>
       <li>Published: {{ book.year }}</li>
       <li>ISBN: {{ book.isbn }}</li>
-      <li>Average Rating: {{ ratings.average }} · {{ ratings.count }} ratings</li>
+      <li><div class="Stars" style="--rating: {{ ratings.average }};" aria-label="Rating of this product is 2.3 out of 5."></div><span id="rating_count"> {{ ratings.average }} · {{ ratings.count }} ratings</span></li>
     </ul>
-    <h3>Community reviews:</h3>
+    {% if reviews %}
+        <h3>Community reviews:</h3>
+    {% endif %}
     <ul>
       {% for review in reviews %}
           <li>

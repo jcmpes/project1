@@ -5,14 +5,30 @@
 {% endblock %}
 
 {% block body %}
-  <form action="/login" method="post">
-      <div class="form-group">
-          <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text">
+    <div class="row">
+      <div class="col-lg-4">
       </div>
-      <div class="form-group">
-          <input class="form-control" name="password" placeholder="Password" type="password">
+      <div class="col-lg-4">
+          <form action="/login" method="post">
+              <div class="form-group">
+                  <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text">
+              </div>
+              <div class="form-group">
+                  <input class="form-control" name="password" placeholder="Password" type="password">
+              </div>
+              <div class="row">
+                  <div class="col text-center">
+                      <button class="btn btn-primary" id="login" type="submit">Log In</button>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col text-center">
+                      <span>Not a user yet? <a href="/register">Register first</a></span>
+                  </div>
+              </div>
+          </form>
       </div>
-      <button class="btn btn-primary" type="submit">Log In</button>
-      Not a user yet? Please, <a href="/register">register first</a>
-  </form>
+      <div class="col-lg-4">
+      </div>
+    </div>
 {% endblock %}

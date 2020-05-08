@@ -25,3 +25,8 @@
 .siteHeader > img {
     flex: none; /* keep aspect ratio */
 }
+
+#login {
+    padding: 5px 45px;
+    margin-bottom: 5px;
+}
